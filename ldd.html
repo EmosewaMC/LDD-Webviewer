@@ -2,9 +2,8 @@
 <html>
 <body>
 
-<h2>JavaScript Functions</h2>
-
-<p>This example calls a function which performs a calculation and returns the result:</p>
+<h2>LDD WebGL Viewer</h2>
+<p>The result will be shown below:</p>
 
 <p id="demo"></p>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
@@ -1028,7 +1027,7 @@ var pageparams = window.location.search
 	}
 	
 	else{
-		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/test01.lxfml"
+		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/min.lxfml"
 	}
 
 var ldddburl = FindDBURL()
@@ -1049,9 +1048,13 @@ else {
 
   {
     const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
+    const intensity = 0.7;
+    var light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-10, 20, 40);
+    scene.add(light);
+    
+    var light = new THREE.DirectionalLight(color, 0.7);
+    light.position.set(10, 5, 7);
     scene.add(light);
   }
 
@@ -1066,7 +1069,8 @@ camera.position.set( 0, 5, 20 );
 var render = function () {
 	requestAnimationFrame(render);
 	
-	camera.rotation.z += 0.001;
+	//camera.rotation.y += 0.001;
+	camera.rotation.z += 0.01;
 
 	renderer.render(scene, camera);
 };
