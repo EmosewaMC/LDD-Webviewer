@@ -433,7 +433,7 @@ class GeometryReader{
 class Geometry {
 	constructor(designID, database){
 		this.designID = designID
-		this.Parts = {}
+		this.Parts = []
 		var GEOMETRIEPATH = 'Primitives/LOD0/'
 		var PRIMITIVEPATH = 'Primitives/'
 		
@@ -853,10 +853,25 @@ class DBURLReader {
 
 
 //Start
+var scenefile = ''
+var pageparams = window.location.search
+	.substring(1)
+	.split("&")
+	.map(v => v.split("="))
+	.reduce((map, [key, value]) => map.set(key, decodeURIComponent(value)), new Map())
+	if (pageparams.get('scene')){
+		scenefile = pageparams.get('scene')
+	}
+	
+	else{
+		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/test01.lxfml"
+	}
+
+
 if (FindDBURL()) {
 	converter = new Converter()
 	converter.LoadDBURL(dbURLlocation = FindDBURL())
-	converter.LoadScene(filename = "https://raw.githubusercontent.com/sttng/LDD/master/test01.lxfml")
+	converter.LoadScene(filename = scenefile)
 	converter.Export(filename = 'test.webgl')
 	
 }
