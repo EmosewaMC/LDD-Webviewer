@@ -350,8 +350,6 @@ class Scene{
 }
 
 
-
-
 class GeometryReader{
 	//done
 	constructor(data){
@@ -451,6 +449,74 @@ class GeometryReader{
 }
 
 
+class Geometry {
+	//done
+	constructor(designID, database){
+		this.designID = designID
+		this.Parts = []
+		var GEOMETRIEPATH = 'Primitives/LOD0/'
+		var PRIMITIVEPATH = 'Primitives/'
+		
+		this.studsFields2D = []
+		var GeometryLocation = `${GEOMETRIEPATH}${designID}.g`
+		var PrimitiveLocation = `${PRIMITIVEPATH}${designID}.xml`
+		
+		var GeometryCount = 0
+		
+		while (GeometryLocation in database.filelist) {
+			this.Parts[GeometryCount] = new GeometryReader(database.filelist[GeometryLocation].read())
+			GeometryCount += 1
+			GeometryLocation = `${GEOMETRIEPATH}${designID}.g${GeometryCount}`
+		}
+		var primitive = new Primitive(database.filelist[PrimitiveLocation].read())
+		this.Partname = primitive.Designname
+		this.studsFields2D = primitive.Fields2D
+		
+		//preflex
+		for (const [h, part] of this.Parts.entries()) {
+			//transform
+			for (const [i, b] of primitive.Bones.entries()) {
+				//positions
+				for (const [j, p] of this.Parts[h].positions.entries()) {
+					if (this.Parts[h].bonemap[j] == i){
+						this.Parts[h].positions[j].transform(b.matrix)
+					}
+				}
+				//normals
+				for (const [k, n] of this.Parts[h].normals.entries()) {
+					if (this.Parts[h].bonemap[k] == i){
+						this.Parts[h].normals[k].transform(b.matrix)
+					}
+				}
+			}
+		}
+	}
+	
+	valuecount(){
+		var count = 0
+		for (const part of this.Parts) {
+			count += part.valueCount
+		}
+		return count
+	}
+	
+	facecount(){
+		var count = 0
+		for (const part of this.Parts) {
+			count += part.facecount
+		}
+		return count
+	}
+	
+	texcount(){
+		var count = 0
+		for (const part of this.Parts) {
+			count += part.texCount
+		}
+		return count
+	}
+}
+
 
 class DBinfo {
 	//done
@@ -504,12 +570,45 @@ class Converter {
 				
 				if (!(pa.designID in geometriecache)) {
 					var geo = new Geometry(pa.designID, this.database)
-					//console.log(geo)
 					geometriecache[pa.designID] = geo
 				}
 				else {
-				
+					
+					geo = geometriecache[pa.designID]
 				}
+					
+				for (const part of geo.Parts){
+					part.outpositions = Array.from(part.positions);
+					part.outnormals = Array.from(part.normals);
+					
+					for (const [i, b] of pa.Bones.entries()) {
+						//positions
+						for (const [j, p] of part.outpositions.entries()){
+							if (part.bonemap[j] == i){
+								p.transform(invert.mul(b.matrix))
+							}
+						}
+						//normals
+						for (const [k, n] of part.outnormals.entries()){
+							if (part.bonemap[k] == i){
+								n.transformW(invert.mul(b.matrix))
+							}
+						}
+					}
+					
+					for (const point of part.outpositions){
+						console.log(point.toString())
+					}
+					for (const normal of part.outnormals){
+						console.log(normal.toString())
+					}
+					for (const text of part.textures){
+						console.log(text.toString())
+					}
+
+
+				}
+				
 			
 			}
 		}
@@ -559,55 +658,7 @@ class LOCReader {
 
 
 
-class Geometry {
-	constructor(designID, database){
-		this.designID = designID
-		this.Parts = []
-		var GEOMETRIEPATH = 'Primitives/LOD0/'
-		var PRIMITIVEPATH = 'Primitives/'
-		
-		this.studsFields2D = []
-		var GeometryLocation = `${GEOMETRIEPATH}${designID}.g`
-		var PrimitiveLocation = `${PRIMITIVEPATH}${designID}.xml`
 
-		var GeometryCount = 0
-		
-		while (GeometryLocation in database.filelist) {
-			this.Parts[GeometryCount] = new GeometryReader(database.filelist[GeometryLocation].read())
-			GeometryCount += 1
-			GeometryLocation = `${GEOMETRIEPATH}${designID}.g${GeometryCount}`
-		}
-		var primitive = new Primitive(database.filelist[PrimitiveLocation].read())
-		this.Partname = primitive.Designname
-		this.studsFields2D = primitive.Fields2D
-		
-		//preflex
-		for (const [h, part] of this.Parts.entries()) {
-			//transform
-			for (const [i, b] of primitive.Bones.entries()) {
-				//positions
-				for (const [j, p] of this.Parts[h].positions.entries()) {
-					if (this.Parts[h].bonemap[j] == i){
-						this.Parts[h].positions[j].transform(b.matrix)
-					}
-				}
-				//normals
-				for (const [k, n] of this.Parts[h].normals.entries()) {
-					if (this.Parts[h].bonemap[k] == i){
-						this.Parts[h].normals[k].transform(b.matrix)
-					}
-				}
-			}
-		}
-	}
-	
-	valuecount(){
-	
-	}
-	
-
-
-}
 
 
 class Bone2 {
@@ -905,7 +956,7 @@ var pageparams = window.location.search
 	}
 	
 	else{
-		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/test01.lxfml"
+		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/min.lxfml"
 	}
 
 var ldddburl = FindDBURL()
