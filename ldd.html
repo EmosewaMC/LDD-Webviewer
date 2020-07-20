@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>JavaScript Functions</h2>
+
+<p>This example calls a function which performs a calculation and returns the result:</p>
+
+<p id="demo"></p>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r118/three.min.js"></script>
+<script type="text/javascript" src="base64-binary.js"></script>
+<script>
+
+class Matrix3D{
+	//done
+	constructor(n11=1,n12=0,n13=0,n14=0,n21=0,n22=1,n23=0,n24=0,n31=0,n32=0,n33=1,n34=0,n41=0,n42=0,n43=0,n44=1){
+		this.n11 = n11
+		this.n12 = n12
+		this.n13 = n13
+		this.n14 = n14
+		this.n21 = n21
+		this.n22 = n22
+		this.n23 = n23
+		this.n24 = n24
+		this.n31 = n31
+		this.n32 = n32
+		this.n33 = n33
+		this.n34 = n34
+		this.n41 = n41
+		this.n42 = n42
+		this.n43 = n43
+		this.n44 = n44
+	}
+	
+	toString(){
+		return `[${this.n11}, ${this.n12}, ${this.n13}, ${this.n14}, ${this.n21}, ${this.n22}, ${this.n23}, ${this.n24}, ${this.n31}, ${this.n32}, ${this.n33}, ${this.n34}, ${this.n41}, ${this.n42}, ${this.n43}, ${this.n44}]`
+	}
+	
+	rotate(angle, axis){
+		var c = Math.cos(angle)
+		var s = Math.sin(angle)
+		var t = 1 - c
+		
+		var tx = t * axis.x
+		var ty = t * axis.y
+		var tz = t * axis.z
+		
+		var sx = s * axis.x
+		var sy = s * axis.y
+		var sz = s * axis.z
+		
+		this.n11 = c + axis.x * tx
+		this.n12 = axis.y * tx + sz
+		this.n13 = axis.z * tx - sy
+		this.n14 = 0
+		
+		this.n21 = axis.x * ty - sz
+		this.n22 = c + axis.y * ty
+		this.n23 = axis.z * ty + sx
+		this.n24 = 0
+		
+		this.n31 = axis.x * tz + sy
+		this.n32 = axis.y * tz - sx
+		this.n33 = c + axis.z * tz
+		this.n34 = 0
+
+		this.n41 = 0
+		this.n42 = 0
+		this.n43 = 0
+		this.n44 = 1
+	}
+	
+	mul(other){
+		return new Matrix3D(this.n11 * other.n11 + this.n21 * other.n12 + this.n31 * other.n13 + this.n41 * other.n14,
+			this.n12 * other.n11 + this.n22 * other.n12 + this.n32 * other.n13 + this.n42 * other.n14,
+			this.n13 * other.n11 + this.n23 * other.n12 + this.n33 * other.n13 + this.n43 * other.n14,
+			this.n14 * other.n11 + this.n24 * other.n12 + this.n34 * other.n13 + this.n44 * other.n14,
+			this.n11 * other.n21 + this.n21 * other.n22 + this.n31 * other.n23 + this.n41 * other.n24,
+			this.n12 * other.n21 + this.n22 * other.n22 + this.n32 * other.n23 + this.n42 * other.n24,
+			this.n13 * other.n21 + this.n23 * other.n22 + this.n33 * other.n23 + this.n43 * other.n24,
+			this.n14 * other.n21 + this.n24 * other.n22 + this.n34 * other.n23 + this.n44 * other.n24,
+			this.n11 * other.n31 + this.n21 * other.n32 + this.n31 * other.n33 + this.n41 * other.n34,
+			this.n12 * other.n31 + this.n22 * other.n32 + this.n32 * other.n33 + this.n42 * other.n34,
+			this.n13 * other.n31 + this.n23 * other.n32 + this.n33 * other.n33 + this.n43 * other.n34,
+			this.n14 * other.n31 + this.n24 * other.n32 + this.n34 * other.n33 + this.n44 * other.n34,
+			this.n11 * other.n41 + this.n21 * other.n42 + this.n31 * other.n43 + this.n41 * other.n44,
+			this.n12 * other.n41 + this.n22 * other.n42 + this.n32 * other.n43 + this.n42 * other.n44,
+			this.n13 * other.n41 + this.n23 * other.n42 + this.n33 * other.n43 + this.n43 * other.n44,
+			this.n14 * other.n41 + this.n24 * other.n42 + this.n34 * other.n43 + this.n44 * other.n44)
+	}
+}
+
+class Point3D{
+	//done
+	constructor(x=0,y=0,z=0){
+		this.x = x
+		this.y = y
+		this.z = z
+	}
+	
+	toString(){
+		return `[${this.x}, ${this.y}, ${this.z}]`
+	}
+	
+	transformW(matrix){
+		var x = matrix.n11 * this.x + matrix.n21 * this.y + matrix.n31 * this.z
+		var y = matrix.n12 * this.x + matrix.n22 * this.y + matrix.n32 * this.z
+		var z = matrix.n13 * this.x + matrix.n23 * this.y + matrix.n33 * this.z
+		this.x = x
+		this.y = y
+		this.z = z
+	}
+	
+	transform(matrix){
+		var x = matrix.n11 * this.x + matrix.n21 * this.y + matrix.n31 * this.z + matrix.n41
+		var y = matrix.n12 * this.x + matrix.n22 * this.y + matrix.n32 * this.z + matrix.n42
+		var z = matrix.n13 * this.x + matrix.n23 * this.y + matrix.n33 * this.z + matrix.n43
+		this.x = x
+		this.y = y
+		this.z = z
+	}
+	
+	copy(){
+		return new Point3D(this.x, this.y, this.z)
+	}
+}
+
+
+class Point2D{
+	constructor(x=0,y=0){
+		this.x = x
+		this.y = y
+	}
+	
+	toString(){
+		return `[${this.x}, ${this.y}]`
+	}
+	
+	copy(){
+		return new Point2D(this.x, this.y)
+	}
+}
+
+
+class Face{
+	constructor(a=0,b=0,c=0){
+		this.a = a
+		this.b = b
+		this.c = c
+	}
+	
+	toString(){
+		return `[${this.a}, ${this.b}, ${this.c}]`
+	}
+}
+
+class DBinfo {
+	//done
+	constructor(data) {
+		var parser = new DOMParser();
+		var xml = parser.parseFromString(data, "text/xml");
+		var Version = xml.getElementsByTagName('Bricks')[0].attributes['version'].value
+		console.log('DB Version: ' + Version);
+		return ('DB Version: ' + Version);
+	}
+}
+
+
+class Converter {
+	
+	LoadDBURL(dbURLlocation){
+		this.database = new DBURLReader(dbURLlocation)
+		if(this.database.initok && this.database.fileexist('Materials.xml') && this.database.fileexist('localizedStrings.loc')){
+			this.allMaterials = new Materials(this.database.filelist['Materials.xml'].read())
+			this.allMaterials.setLOC(new LOCReader(this.database.filelist['localizedStrings.loc'].read()))
+		}
+	}
+	
+	LoadScene(filename){
+		if(this.database.initok){
+			this.scene = new Scene(filename)
+		}
+	}
+	
+	Export(filename){
+	
+		var x = (4 * 3);
+		document.getElementById("demo").innerHTML = x;
+		
+		var invert = new Matrix3D() 
+		//invert.n33 = -1 //uncomment to invert the Z-Axis
+		
+		var indexOffset = 1
+		var textOffset = 1
+		var usedmaterials = []
+		var geometriecache = {}
+		
+		
+		var total = this.scene.Bricks.length
+		var current = 0
+		
+		for (const bri of this.scene.Bricks){
+			current += 1
+		
+			for (const pa of bri.Parts){
+				
+				if (!(pa.designID in geometriecache)) {
+					var geo = new Geometry(pa.designID, this.database)
+					//console.log(geo)
+					geometriecache[pa.designID] = geo
+				}
+				else {
+				
+				}
+			
+			}
+		}
+	
+	}
+}
+
+
+class LOCReader {
+	//done
+	constructor(data) {
+		this.offset = 0
+		this.values = {}
+		this.data = data
+		if (this.data[0].charCodeAt() == 50 && this.data[1].charCodeAt() == 0){
+			
+			this.offset += 2
+			while (this.offset < this.data.length){
+				var key = this.NextString().replace('Material', '')
+				var value = this.NextString()
+				this.values[key] = value
+			}
+		}
+	}
+	
+	NextString(){
+		var out =''
+		var t = this.data[this.offset].charCodeAt()
+		this.offset += 1
+		while (t != 0){
+			out = out + String.fromCharCode(t)
+			t = this.data[this.offset].charCodeAt()
+			this.offset += 1
+		}
+		return out;
+	}
+}
+
+class Group{
+	//done
+	constructor(node){
+		this.partRefs =  node.getAttribute('partRefs').split(',')
+	}
+}
+
+class Bone{
+	//done
+	constructor(node){
+		this.refID = node.getAttribute('refID')
+		let [a, b, c, d, e, f, g, h, i, x, y, z] = node.getAttribute('transformation').split(',').map(parseFloat);
+		this.matrix = new Matrix3D(a,b,c,0,d,e,f,0,g,h,i,0,x,y,z,1);
+	}
+}
+
+
+class Part{
+	//done
+	constructor(node){
+		this.isGrouped = false
+		this.GroupIDX = 0
+		this.Bones = []
+		this.refID = node.getAttribute('refID')
+		this.designID = node.getAttribute('designID')
+		this.materials =  node.getAttribute('materials').split(',')
+		
+		var lastm = '0'
+		for (const [i, m] of this.materials.entries()) {
+			if (m == '0'){
+				this.materials[i] = lastm
+			}
+			else {
+				lastm = m
+			}
+		}
+
+		if (node.hasAttribute('decoration')){
+			this.decoration = node.getAttribute('decoration').split(',')
+		}
+		var childnodes = node.childNodes
+		for (var j = 0; j < childnodes.length ;j++) {
+			var childnode = childnodes[j]
+			if (childnode.nodeName == 'Bone'){
+				this.Bones.push(new Bone(childnode))
+			}
+		}
+	}
+}
+
+
+class Brick{
+	//done
+	constructor(node){
+		this.refID = node.getAttribute('refID')
+		this.designID = node.getAttribute('designID')
+		this.Parts = []
+		var childnodes = node.childNodes
+		for (var j = 0; j < childnodes.length ;j++) {
+			var childnode = childnodes[j]
+			if (childnode.nodeName == 'Part'){
+				this.Parts.push(new Part(childnode))
+			}
+		}
+	}
+}
+
+class SceneCamera{
+	//done
+	constructor(node){
+		this.refID = node.getAttribute('refID')
+		let [a, b, c, d, e, f, g, h, i, x, y, z] = node.getAttribute('transformation').split(',').map(parseFloat);
+		this.matrix = new Matrix3D(a,b,c,0,d,e,f,0,g,h,i,0,x,y,z,1);
+		this.fieldOfView = parseFloat(node.getAttribute('fieldOfView'));
+		this.distance = parseFloat(node.getAttribute('distance'));
+	}
+}
+
+
+class GeometryReader{
+	//done
+	constructor(data){
+		this.offset = 0
+		this.data = data
+		this.positions = []
+		this.normals = []
+		this.textures = []
+		this.faces = []
+		this.bonemap = []
+		this.texCount = 0
+		this.outpositions = []
+		this.outnormals = []
+		
+		this.binary = "";
+		
+		for (var i = 0; i < data.length; i++ ) {
+			this.binary += String.fromCharCode(data.charCodeAt(i) & 255)
+		}
+		this.data = Base64Binary.decodeArrayBuffer(btoa(this.binary)); 
+		this.view = new Uint8Array(this.data);
+		
+		if (this.readInt() == 1111961649){
+			this.valueCount = this.readInt()
+			this.indexCount = this.readInt()
+			this.faceCount = this.indexCount / 3
+			var options = this.readInt()
+			
+			for (var i = 0; i < this.valueCount ;i++) {
+				this.positions.push(new Point3D(this.readFloat(), this.readFloat(), this.readFloat()))
+			}
+			for (var i = 0; i < this.valueCount ;i++) {
+				this.normals.push(new Point3D(this.readFloat(), this.readFloat(), this.readFloat()))
+			}
+			if ((options & 3) == 3){
+				this.texCount = this.valueCount
+				for (var i = 0; i < this.valueCount ;i++) {
+					this.textures.push(new Point2D(this.readFloat(), this.readFloat()))
+				}
+			}
+			for (var i = 0; i < this.faceCount ;i++) {
+				this.faces.push(new Face(this.readInt(), this.readInt(), this.readInt()))
+			}
+			if ((options & 48) == 48){
+				var num = this.readInt()
+				this.offset += (num * 4) + (this.indexCount * 4)
+				num = this.readInt()
+				this.offset += (3 * num * 4) + (this.indexCount * 4)
+			}
+			
+			var bonelength = this.readInt()
+			this.bonemap.length = this.valueCount
+			this.bonemap.fill(0);
+			
+			if ((bonelength > this.valueCount) || (bonelength > this.faceCount)){
+				var datastart = this.offset
+				this.offset += bonelength
+				for (var i = 0; i < this.valueCount ;i++) {
+					var boneoffset = this.readInt() + 4
+					this.bonemap[i] = this.read_Int(datastart + boneoffset)
+				}
+			}
+		}
+	}
+	
+	read_Int(_offset){
+		//console.log(_offset)
+		var ret = (this.view[_offset+0]) + (this.view[_offset+1]<<8)+ (this.view[_offset+2]<<16) + (this.view[_offset+3]<<24)
+		//console.log(ret)
+		return ret
+	}
+	
+	readInt(){
+		//var ret = (this.view[this.offset+0]<<24) + (this.view[this.offset+1]<<16)+ (this.view[this.offset+2]<<8) + (this.view[this.offset+3])
+		var ret = (this.view[this.offset+0]) + (this.view[this.offset+1]<<8)+ (this.view[this.offset+2]<<16) + (this.view[this.offset+3]<<24)
+		this.offset += 4
+		//console.log(ret)
+		return ret
+	}
+	
+	readFloat(){
+		var tempdata = [(this.view[this.offset+3]), (this.view[this.offset+2]), (this.view[this.offset+1]), (this.view[this.offset+0])];
+		// Create a buffer and a data view of it
+		var buf = new ArrayBuffer(4);
+		var view = new DataView(buf);
+
+		// set bytes
+		tempdata.forEach(function (b, i) {
+			view.setInt8(i, b);
+		});
+
+		// Read the bits as a float; note that by doing this, we're implicitly converting it from a 32-bit float into JavaScript's native 64-bit double
+		var number = view.getFloat32(0);
+		this.offset += 4
+		return number
+	}
+}
+
+
+class Geometry {
+	constructor(designID, database){
+		this.designID = designID
+		this.Parts = {}
+		var GEOMETRIEPATH = 'Primitives/LOD0/'
+		var PRIMITIVEPATH = 'Primitives/'
+		
+		this.studsFields2D = []
+		var GeometryLocation = `${GEOMETRIEPATH}${designID}.g`
+		var PrimitiveLocation = `${PRIMITIVEPATH}${designID}.xml`
+
+		var GeometryCount = 0
+		
+		while (GeometryLocation in database.filelist) {
+			this.Parts[GeometryCount] = new GeometryReader(database.filelist[GeometryLocation].read())
+			GeometryCount += 1
+			GeometryLocation = `${GEOMETRIEPATH}${designID}.g${GeometryCount}`
+		}
+		var primitive = new Primitive(database.filelist[PrimitiveLocation].read())
+		this.Partname = primitive.Designname
+		this.studsFields2D = primitive.Fields2D
+		
+		for (const part of this.Parts) { 
+			
+		}
+
+	}
+
+
+}
+
+
+class Bone2 {
+	//done
+	constructor(boneId=0, angle=0, ax=0, ay=0, az=0, tx=0, ty=0, tz=0){
+		this.boneId = boneId
+		var rotationMatrix = new Matrix3D()
+		rotationMatrix.rotate(-angle * Math.PI / 180.0, new Point3D(ax, ay, az))
+		var p = new Point3D(tx, ty, tz)
+		p.transformW(rotationMatrix)
+		rotationMatrix.n41 -= p.x
+		rotationMatrix.n42 -= p.y
+		rotationMatrix.n43 -= p.z
+		this.matrix = rotationMatrix
+	}
+}
+
+
+class Field2D{
+	//done
+	constructor(type=0, width=0, height=0, angle=0, ax=0, ay=0, az=0, tx=0, ty=0, tz=0, field2DRawData='none'){
+		this.type = type
+		this.field2DRawData = field2DRawData
+		var rotationMatrix = new Matrix3D()
+		rotationMatrix.rotate(-angle * Math.PI / 180.0, new Point3D(ax, ay, az))
+		var p = new Point3D(tx, ty, tz)
+		p.transformW(rotationMatrix)
+		rotationMatrix.n41 -= p.x
+		rotationMatrix.n42 -= p.y
+		rotationMatrix.n43 -= p.z
+		this.matrix = rotationMatrix
+		this.custom2DField = []
+		
+		var rows_count = height + 1
+		var cols_count = width + 1
+		this.custom2DField = new Array(rows_count).fill(new Array(cols_count).fill(0));
+		var custom2DFieldString = field2DRawData.replace(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g, '').replace(/\s/g, '')
+		var custom2DFieldArr = custom2DFieldString.split(',')
+		
+		var k = 0
+		for (var i = 0; i < rows_count ;i++) {
+			for (var j = 0; j < cols_count ;j++){
+				this.custom2DField[i][j] = custom2DFieldArr[k]
+				k += 1
+			}
+		}
+	}
+}
+
+
+class Primitive {
+	//done
+	constructor(data){
+		this.Designname = ''
+		this.Bones = []
+		this.Fields2D = []
+		this.PhysicsAttributes = {}
+		this.Bounding = {}
+		this.GeometryBounding = {}
+		var parser = new DOMParser();
+		var xml = parser.parseFromString(data,"text/xml");
+		
+		var nodes = xml.firstChild.childNodes;
+		for (var i = 0; i < nodes.length ;i++) {
+			var node = nodes[i]
+			if (node.nodeName == 'Flex'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'Bone'){
+						this.Bones.push(new Bone2(parseInt(childnode.getAttribute('boneId')), parseFloat(childnode.getAttribute('angle')), parseFloat(childnode.getAttribute('ax')), parseFloat(childnode.getAttribute('ay')), parseFloat(childnode.getAttribute('az')), parseFloat(childnode.getAttribute('tx')), parseFloat(childnode.getAttribute('ty')), parseFloat(childnode.getAttribute('tz'))))
+					}
+				}
+			}
+			else if (node.nodeName == 'Annotations'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'Annotation' && childnode.hasAttribute('designname')){
+						this.Designname = childnode.getAttribute('designname')
+					}
+				}
+			
+			}
+			else if (node.nodeName == 'Connectivity'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'Custom2DField'){
+						this.Fields2D.push(new Field2D(parseInt(childnode.getAttribute('type')), parseInt(childnode.getAttribute('width')), parseInt(childnode.getAttribute('height')), parseFloat(childnode.getAttribute('angle')), parseFloat(childnode.getAttribute('ax')), parseFloat(childnode.getAttribute('ay')), parseFloat(childnode.getAttribute('az')), parseFloat(childnode.getAttribute('tx')), parseFloat(childnode.getAttribute('ty')), parseFloat(childnode.getAttribute('tz')), (childnode.firstChild.data)))
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+class Scene{
+	//partially done - need zip file handling
+	constructor(file){
+		this.Bricks = []
+		this.Scenecamera = []
+		this.Groups = []
+		var xmldata =''
+		if (file.endsWith('.lxfml')){
+			var lxfmlfile = new DBURLFile(file,file)
+			xmldata = lxfmlfile.read()
+		}
+		else if (file.endsWith('.lxf')){
+			alert('IMAGE100.LXFML')
+			
+			var promise = new JSZip.external.Promise(function (resolve, reject) {
+				JSZipUtils.getBinaryContent(file, function(err, data) {
+					if (err) {
+						reject(err);
+					} else {
+						resolve(data);
+					}
+				});
+			});
+
+			promise.then(JSZip.loadAsync)                     // 2) chain with the zip promise
+			.then(function(zip) {
+				return zip.file("IMAGE100.LXFML").async("string"); // 3) chain with the text content promise
+			})
+			.then(function success(text) {                    // 4) display the result
+				
+				xmldata = text
+				console.log(xmldata)
+				
+				
+				
+			}, function error(e) {
+				console.log(e)
+			});
+		}
+		else {
+			return
+		}
+		
+		var parser = new DOMParser();
+		var xml = parser.parseFromString(xmldata, "text/xml");
+		this.Name = xml.firstChild.getAttribute('name')
+		
+		var nodes = xml.firstChild.childNodes;
+		for (var i = 0; i < nodes.length ;i++) {
+			var node = nodes[i]
+			if (node.nodeName == 'Meta'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'BrickSet'){
+						this.Version = childnode.getAttribute('version')
+					}
+				}
+			}
+			else if (node.nodeName == 'Cameras'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'Camera'){
+						this.Scenecamera.push(new SceneCamera(childnode))
+					}
+				}
+			}
+			else if (node.nodeName == 'Bricks'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'Brick'){
+						this.Bricks.push(new Brick(childnode))
+					}
+				}
+			}
+			else if (node.nodeName == 'GroupSystems'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'GroupSystem'){
+						var subchildnodes = childnode.childNodes
+						for (var k = 0; k < subchildnodes.length ;k++) {
+							var subchildnode = subchildnodes[k]
+							if (subchildnode.nodeName == 'Group'){
+								this.Groups.push(new Group(subchildnode))
+							}
+						}
+					}
+				}
+			}
+					
+		}
+		
+		for (const [i, m] of this.Groups.entries()) {
+			for (const brick of this.Bricks){
+				for (const part of brick.Parts){
+					if (m.partRefs.indexOf(part.refID) !== -1) { 
+						part.isGrouped = true
+						part.GroupIDX = i
+					}
+				}
+			}
+		}
+		console.log('Scene "'+ this.Name + '" Brickversion: ' + this.Version)
+	}
+}
+
+class Materials {
+	//done
+	constructor(data) {
+		this.Materials = {}
+		var parser = new DOMParser();
+		var xml = parser.parseFromString(data,"text/xml");
+		
+		var nodes = xml.firstChild.childNodes;
+		for (var i = 0; i < nodes.length ;i++) {
+			var node = nodes[i]
+			if (node.nodeName == 'Material') {
+				this.Materials[node.getAttribute('MatID')] = new Material(node.getAttribute('MatID'), parseInt(node.getAttribute('Red')), parseInt(node.getAttribute('Green')), parseInt(node.getAttribute('Red')), parseInt(node.getAttribute('Blue')), parseInt(node.getAttribute('Alpha')), node.getAttribute('MaterialType'))
+			}
+			
+		}
+	}
+	
+	setLOC(loc){
+		for (var key in loc.values){
+			if (key in this.Materials){
+				this.Materials[key].name = loc.values[key].replace(" ", "_")
+			}
+		}
+	}
+	
+	getMaterialbyId(mid) {
+		return this.Materials[mid]
+	}
+}
+
+
+class Material {
+	//done
+	constructor(id, r, g, b, a, mtype) {
+		this.id = id
+		this.name = ''
+		this.mattype = mtype
+		this.r = parseFloat(r)
+		this.g = parseFloat(g)
+		this.b = parseFloat(b)
+		this.a = parseFloat(a)
+	}
+
+	string(){
+		out = ('Red: ' + this.r + ' Green: ' + this.g + ' Blue: '+ this.b + ' Aplha: ' + this.a)
+		return out;
+	}
+}
+
+
+function FindDBURL(){
+	var dburl = 'https://api.github.com/repos/sttng/LDD-DB/git/trees/master?recursive=1'
+	let xhr = new XMLHttpRequest();
+	xhr.open('GET', dburl, false);  // `false` makes the request synchronous
+	xhr.setRequestHeader("Authorization", "token 0c8d5b77e090e3ddaefc24a708aec7eb90a1293c");
+
+	// request state change event
+	xhr.onreadystatechange = function() {
+		
+		// request completed?
+		if (xhr.readyState !== 4) {//return;
+			dburl = false;
+			console.log('readyState error in FindDBURL:', xhr.status, xhr.statusText);
+		}
+		if (xhr.status === 200) {
+			// request successful - show response
+			//console.log(xhr.responseText);
+		}
+		else {
+			// request error
+			dburl = false;
+			console.log('HTTP error in FindDBURL:', xhr.status, xhr.statusText);
+		}
+	};
+	
+	// start request
+	xhr.send();
+	return dburl
+}
+
+class DBURLFile {
+	constructor(urlHandle, name) {
+		this.urlHandle = urlHandle
+		this.name = name
+	}
+
+	read() {
+		var fileContent
+		var self = this;
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', self.urlHandle, false);
+		// Hack to pass bytes through unprocessed.
+		xhr.overrideMimeType('text/plain; charset=x-user-defined');
+		
+		// request state change event
+		xhr.onreadystatechange = function() {
+			
+			// request completed?
+			if (xhr.readyState !== 4) {//return;
+				console.log('readyState error in DBURLFile:', xhr.status, xhr.statusText);
+			}
+			if (xhr.status === 200) {
+				// request successful - show response
+				fileContent = xhr.responseText;
+			}
+			else {
+				// request error
+				console.log('HTTP error in DBURLFile:', xhr.status, xhr.statusText);
+			}
+		};
+		
+		// start request
+		xhr.send();
+		return fileContent
+	}
+}
+
+
+class DBURLReader {
+	constructor(dburl) {
+		this.filelist = {};
+		this.initok = false;
+		this.location = dburl;
+		this.dbinfo = '';
+		this.parse(this.location);
+		
+		// console.log(JSON.stringify(this.filelist))
+		
+		if(this.fileexist('Materials.xml') && this.fileexist('info.xml')){
+			this.dbinfo = new DBinfo(this.filelist['info.xml'].read());
+			this.initok = true
+		}
+		else{
+			alert("db url ERROR")
+		}
+	}
+	
+	fileexist(filename) {
+		var self = this;
+		return self.filelist[filename];
+	}
+	
+	parse(dburl) {
+		var self = this;
+		let xhr = new XMLHttpRequest();
+		xhr.open('GET', dburl, false);
+		xhr.setRequestHeader("Authorization", "token 0c8d5b77e090e3ddaefc24a708aec7eb90a1293c");
+		
+		// request state change event
+		xhr.onreadystatechange = function() {
+			
+			// request completed?
+			if (xhr.readyState !== 4) return;
+		
+			if (xhr.status === 200) {
+				// request successful - show response
+				var data = JSON.parse(xhr.responseText)
+				//console.log(JSON.stringify(data, null, "\t"));
+				for(var i = 0; i < data.tree.length; i++) {
+					var obj = data.tree[i];
+					if (obj.type == 'tree'){
+						// nothing todo
+					}
+					else if (obj.type == 'blob'){
+						self.filelist[obj.path] = new DBURLFile('https://raw.githubusercontent.com/sttng/LDD-DB/master/' + obj.path, obj.path)
+					}
+					else {
+						console.log('Strange object parsed: ' + obj.type)
+					}
+				}
+			}
+			else {
+				// request error
+				console.log('HTTP error', xhr.status, xhr.statusText);
+			}
+		};
+		
+		// start request
+		xhr.send();
+	}
+}
+
+
+//Start
+if (FindDBURL()) {
+	converter = new Converter()
+	converter.LoadDBURL(dbURLlocation = FindDBURL())
+	converter.LoadScene(filename = "https://raw.githubusercontent.com/sttng/LDD/master/test01.lxfml")
+	converter.Export(filename = 'test.webgl')
+	
+}
+else {
+	alert("LDD database not available. Please look for LEGO-Digital-Designer database.")
+}
+
+
+</script>
+
+</body>
+</html>
