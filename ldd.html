@@ -581,22 +581,57 @@ class Converter {
 					
 					geo = geometriecache[pa.designID]
 				}
-					
+				
+				
+				var ind = 0
+				var n11 = pa.Bones[ind].matrix.n11
+				var n12 = pa.Bones[ind].matrix.n12
+				var n13 = pa.Bones[ind].matrix.n13
+				var n14 = pa.Bones[ind].matrix.n14
+				var n21 = pa.Bones[ind].matrix.n21
+				var n22 = pa.Bones[ind].matrix.n22
+				var n23 = pa.Bones[ind].matrix.n23
+				var n24 = pa.Bones[ind].matrix.n24
+				var n31 = pa.Bones[ind].matrix.n31
+				var n32 = pa.Bones[ind].matrix.n32
+				var n33 = pa.Bones[ind].matrix.n33
+				var n34 = pa.Bones[ind].matrix.n34
+				var n41 = pa.Bones[ind].matrix.n41
+				var n42 = pa.Bones[ind].matrix.n42
+				var n43 = pa.Bones[ind].matrix.n43
+				var n44 = pa.Bones[ind].matrix.n44
+				
+				var m = new THREE.Matrix4();
+				
+				// Only parts with more then 1 bone are flex parts
+				var flexflag = 1
+				
+				
+				if (!(pa.Bones.length > flexflag)){
+					m.set(  n11, n21, n31, n41, 
+							n12, n22, n32, n42, 
+							n13, n23, n33, n43, 
+							n14, n24 ,n34, n44);
+				}
+				
 				for (const [partindex, part] of geo.Parts.entries()){
 					part.outpositions = Array.from(part.positions);
 					part.outnormals = Array.from(part.normals);
 					
-					for (const [i, b] of pa.Bones.entries()) {
-						//positions
-						for (const [j, p] of part.outpositions.entries()){
-							if (part.bonemap[j] == i){
-								p.transform(invert.mul(b.matrix))
+					// translate / rotate only parts with more then 1 bone. This are flex parts
+					if (pa.Bones.length > flexflag){
+						for (const [i, b] of pa.Bones.entries()) {
+							//positions
+							for (const [j, p] of part.outpositions.entries()){
+								if (part.bonemap[j] == i){
+									p.transform(invert.mul(b.matrix))
+								}
 							}
-						}
-						//normals
-						for (const [k, n] of part.outnormals.entries()){
-							if (part.bonemap[k] == i){
-								n.transformW(invert.mul(b.matrix))
+							//normals
+							for (const [k, n] of part.outnormals.entries()){
+								if (part.bonemap[k] == i){
+									n.transformW(invert.mul(b.matrix))
+								}
 							}
 						}
 					}
@@ -641,6 +676,8 @@ class Converter {
 					var material = new THREE.MeshPhongMaterial();
 					material.color.set(lddmat.toString());
 					var mesh = new THREE.Mesh(geometry, material);
+					mesh.matrixAutoUpdate = false
+					mesh.matrix = m
 					scene.add(mesh);
 				}
 				
@@ -681,11 +718,6 @@ class LOCReader {
 		return out;
 	}
 }
-
-
-
-
-
 
 
 
@@ -996,7 +1028,7 @@ var pageparams = window.location.search
 	}
 	
 	else{
-		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/min.lxfml"
+		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/test01.lxfml"
 	}
 
 var ldddburl = FindDBURL()
@@ -1014,7 +1046,6 @@ else {
 
 
 // Three.JS stuff
-
 
   {
     const color = 0xFFFFFF;
@@ -1035,7 +1066,7 @@ camera.position.set( 0, 5, 20 );
 var render = function () {
 	requestAnimationFrame(render);
 	
-	camera.rotation.z += 0.0001;
+	camera.rotation.z += 0.001;
 
 	renderer.render(scene, camera);
 };
