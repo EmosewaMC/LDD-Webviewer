@@ -696,12 +696,14 @@ class Converter {
 					}
 					
 					var material = new THREE.MeshPhongMaterial();
+					//var material1 = new THREE.MeshPhongMaterial();
 					if (!(deco == '0')){
 						var DECORATIONPATH = 'Decorations/'
 						var decofilename = DECORATIONPATH + deco + '.png'
 						var extfile = this.database.filelist[decofilename].urlHandle
 						var texture = new THREE.TextureLoader().load( extfile );
 						material = new THREE.MeshPhongMaterial( { map: texture } );
+						//material.transparent = true
 					}
 					
 					
@@ -710,6 +712,8 @@ class Converter {
 					geometry.setAttribute('normal', new THREE.BufferAttribute(threenormals, 3));
 					geometry.setAttribute('uv', new THREE.BufferAttribute(threeuvs, 2));
 					geometry.setIndex(farr);
+					
+					//var materials = [ material0, material1, material2, material3 ];
 					
 					material.color.set(lddmat.toString());
 					var mesh = new THREE.Mesh(geometry, material);
@@ -1109,7 +1113,7 @@ container.appendChild( renderer.domElement );
 
 
 
-camera.position.set( 0, 4, 40 );
+camera.position.set( 0, 4, 20 );
 
 var render = function () {
 	requestAnimationFrame(render);
