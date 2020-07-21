@@ -21,12 +21,12 @@
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/three@0.118.3/build/three.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/three@0.118.3/examples/js/controls/OrbitControls.js"></script>
 
 <script type="text/javascript" src="base64-binary.js"></script>
-<script>
+<script type="module">
 //Three.js stuff
+import * as THREE from './three.module.js';
+
 const scene = new THREE.Scene();
 
 
