@@ -22,7 +22,8 @@
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/three@0.118.3/build/three.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/super-three@0.116.0/build/three.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/super-three@0.116.0/examples/js/controls/OrbitControls.js"></script>
 
 <script type="text/javascript" src="base64-binary.js"></script>
 <script>
@@ -721,6 +722,7 @@ class Converter {
 					geometry.setAttribute('uv', new THREE.BufferAttribute(threeuvs, 2));
 					geometry.setIndex(farr);
 					
+					
 					var mesh = new THREE.Mesh(geometry, materials);
 					mesh.matrixAutoUpdate = false
 					mesh.matrix = m
@@ -1120,10 +1122,12 @@ container.appendChild( renderer.domElement );
 
 camera.position.set( 0, 4, 20 );
 
+var controls = new THREE.OrbitControls (camera, renderer.domElement);
+
 var render = function () {
 	requestAnimationFrame(render);
 
-	camera.rotation.z += 0.01;
+	//camera.rotation.z += 0.01;
 
 
 	renderer.render(scene, camera);
