@@ -23,7 +23,6 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/three@0.118.3/build/three.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/three@0.118.3/examples/js/controls/OrbitControls.js"></script>
 
 <script type="text/javascript" src="base64-binary.js"></script>
 <script>
@@ -630,11 +629,13 @@ class Converter {
 							n14, n24 ,n34, n44);
 				}
 				
+				var decoCount = 0
+				
 				for (const [partindex, part] of geo.Parts.entries()){
 					part.outpositions = Array.from(part.positions);
 					part.outnormals = Array.from(part.normals);
 					
-					// translate / rotate only parts with more then 1 bone. This are flex parts
+					// translate / rotate only parts with more then 1 bone. This are flex parts.
 					if (pa.Bones.length > flexflag){
 						for (const [i, b] of pa.Bones.entries()) {
 							//positions
@@ -651,25 +652,26 @@ class Converter {
 							}
 						}
 					}
-					var parr =[]
+					var parr = []
 					for (const point of part.outpositions){
 						parr.push(point.x)
 						parr.push(point.y)
 						parr.push(point.z)
-						//console.log(point.toString())
 					}
 					var threevertices = new Float32Array(parr)
 					
-					var narr =[]
+					var narr = []
 					for (const normal of part.outnormals){
 						narr.push(normal.x)
 						narr.push(normal.y)
 						narr.push(normal.z)
-						//console.log(normal.toString())
 					}
 					var threenormals = new Float32Array(narr)
 					
+					var tarr = []
 					for (const text of part.textures){
+						tarr.push(text.x)
+						tarr.push(text.y)
 						//console.log(text.toString())
 					}
 					
@@ -684,12 +686,31 @@ class Converter {
 					var materialCurrentPart = pa.materials[partindex]
 					var lddmat = allMaterials.getMaterialbyId(materialCurrentPart)
 					
+					var deco = '0'
+					if (pa.hasOwnProperty('decoration') && geo.Parts[partindex].textures.length > 0 ){
+						if (decoCount < pa.decoration.length){
+							deco = pa.decoration[decoCount]
+						}
+						decoCount += 1
+					}
+					
+					var extfile = ''
+					var material = new THREE.MeshPhongMaterial();
+					if (!(deco == '0')){
+						var DECORATIONPATH = 'Decorations/'
+						var decofilename = DECORATIONPATH + deco + '.png'
+						extfile = this.database.filelist[decofilename].urlHandle
+						var texture = new THREE.TextureLoader().load( extfile );
+						material = new THREE.MeshBasicMaterial( { map: texture } );
+					}
+					
+					
 					var geometry = new THREE.BufferGeometry();
 					geometry.setAttribute('position', new THREE.BufferAttribute(threevertices, 3));
 					geometry.setAttribute('normal', new THREE.BufferAttribute(threenormals, 3));
 					geometry.setIndex(farr);
 
-					var material = new THREE.MeshPhongMaterial();
+					
 					material.color.set(lddmat.toString());
 					var mesh = new THREE.Mesh(geometry, material);
 					mesh.matrixAutoUpdate = false
