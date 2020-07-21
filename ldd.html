@@ -671,7 +671,8 @@ class Converter {
 					var tarr = []
 					for (const text of part.textures){
 						tarr.push(text.x)
-						tarr.push(text.y)
+						// NOTE Three.js maps Textures in from top to bottom so we calculate 1.0 - t so the image will map properly
+						tarr.push(1 - text.y)
 						//console.log(text.toString())
 					}
 					var threeuvs = new Float32Array(tarr)
@@ -696,27 +697,31 @@ class Converter {
 					}
 					
 					var material = new THREE.MeshPhongMaterial();
-					//var material1 = new THREE.MeshPhongMaterial();
+					material.color.set(lddmat.toString());
+					var material1 = new THREE.MeshPhongMaterial();
+					var materials = [];
+					materials.push(material)
+					
+					var geometry = new THREE.BufferGeometry();
+					geometry.addGroup( 0, Infinity, 0 );
+					
 					if (!(deco == '0')){
 						var DECORATIONPATH = 'Decorations/'
 						var decofilename = DECORATIONPATH + deco + '.png'
 						var extfile = this.database.filelist[decofilename].urlHandle
 						var texture = new THREE.TextureLoader().load( extfile );
-						material = new THREE.MeshPhongMaterial( { map: texture } );
-						//material.transparent = true
+						material1 = new THREE.MeshPhongMaterial( { map: texture } );
+						material1.transparent = true
+						materials.push(material1)
+						geometry.addGroup( 0, Infinity, 1 );
 					}
 					
-					
-					var geometry = new THREE.BufferGeometry();
 					geometry.setAttribute('position', new THREE.BufferAttribute(threevertices, 3));
 					geometry.setAttribute('normal', new THREE.BufferAttribute(threenormals, 3));
 					geometry.setAttribute('uv', new THREE.BufferAttribute(threeuvs, 2));
 					geometry.setIndex(farr);
 					
-					//var materials = [ material0, material1, material2, material3 ];
-					
-					material.color.set(lddmat.toString());
-					var mesh = new THREE.Mesh(geometry, material);
+					var mesh = new THREE.Mesh(geometry, materials);
 					mesh.matrixAutoUpdate = false
 					mesh.matrix = m
 					scene.add(mesh);
