@@ -703,11 +703,13 @@ class Converter {
 					var lddmat = allMaterials.getMaterialbyId(materialCurrentPart)
 					
 					if (typeof lddmat !== 'undefined'){
-						//nothing
+						//nothing. Everything ok.
 					}
 					else {
 						//lddmat undefined
-						console.log(materialCurrentPart)
+						console.log('partindex: ' + partindex)
+						console.log(pa.materials)
+						
 						var lddmat = allMaterials.getMaterialbyId(21)
 					}
 					
