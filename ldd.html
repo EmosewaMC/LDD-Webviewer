@@ -699,7 +699,7 @@ class Converter {
 					if (!(deco == '0')){
 						var DECORATIONPATH = 'Decorations/'
 						var decofilename = DECORATIONPATH + deco + '.png'
-						extfile = this.database.filelist[decofilename].urlHandle
+						var extfile = this.database.filelist[decofilename].urlHandle
 						var texture = new THREE.TextureLoader().load( extfile );
 						material = new THREE.MeshPhongMaterial( { map: texture } );
 					}
