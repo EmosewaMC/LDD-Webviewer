@@ -674,6 +674,7 @@ class Converter {
 						tarr.push(text.y)
 						//console.log(text.toString())
 					}
+					var threeuvs = new Float32Array(tarr)
 					
 					var farr =[]
 					for (const face of part.faces){
@@ -694,22 +695,21 @@ class Converter {
 						decoCount += 1
 					}
 					
-					var extfile = ''
 					var material = new THREE.MeshPhongMaterial();
 					if (!(deco == '0')){
 						var DECORATIONPATH = 'Decorations/'
 						var decofilename = DECORATIONPATH + deco + '.png'
 						extfile = this.database.filelist[decofilename].urlHandle
 						var texture = new THREE.TextureLoader().load( extfile );
-						material = new THREE.MeshBasicMaterial( { map: texture } );
+						material = new THREE.MeshPhongMaterial( { map: texture } );
 					}
 					
 					
 					var geometry = new THREE.BufferGeometry();
 					geometry.setAttribute('position', new THREE.BufferAttribute(threevertices, 3));
 					geometry.setAttribute('normal', new THREE.BufferAttribute(threenormals, 3));
+					geometry.setAttribute('uv', new THREE.BufferAttribute(threeuvs, 2));
 					geometry.setIndex(farr);
-
 					
 					material.color.set(lddmat.toString());
 					var mesh = new THREE.Mesh(geometry, material);
