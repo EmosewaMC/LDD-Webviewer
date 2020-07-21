@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>LDD Webviewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #444;
+			}
+			a {
+				color: #08f;
+			}
+		</style>
+	</head>
+		<body>
+		<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LDD (lxfml) Webviewer<br>
+		<a href="https://sttng.github.io/LDD-Webviewer/ldd.html?scene=https://raw.githubusercontent.com/sttng/LDD-Webviewer/master/Redbeard.lxfml" target="_blank" rel="noopener">Try another</a>
+		</div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+
+<script>
+
+async function lxfdecode(file){
+	console.log(file)
+	var xmldata
+	if (file.endsWith('.lxf')){
+		
+		var promise = new JSZip.external.Promise(function (resolve, reject) {
+			JSZipUtils.getBinaryContent(file, function(err, data) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(data);
+				}
+			});
+		});
+
+		promise.then(JSZip.loadAsync) // 2) chain with the zip promise
+		.then(function(zip) {
+			return zip.file("IMAGE100.LXFML").async("string"); // 3) chain with the text content promise
+		})
+		.then(function success(text) { // 4) display the result
+			//alert('IMAGE100.LXFML')
+			xmldata = text
+			console.log(xmldata)
+			
+			
+			
+		}, function error(e) {
+			console.log(e)
+		});
+	}
+	else {
+		return
+	}
+	
+	if (xmldata === ""){ 
+	alert(xmldata)
+	}
+}
+//Start
+var lxfile = ''
+var pageparams = window.location.search
+	.substring(1)
+	.split("&")
+	.map(v => v.split("="))
+	.reduce((map, [key, value]) => map.set(key, decodeURIComponent(value)), new Map())
+	if (pageparams.get('lxf')){
+		lxfile = pageparams.get('lxf')
+	}
+	
+	else{
+		lxfile = "https://raw.githubusercontent.com/sttng/LDD/master/test01.lxf"
+	}
+
+lxfdecode(lxfile)
+
+
+</script>
+
+</body>
+</html>
