@@ -29,6 +29,7 @@
 <script>
 //Three.js stuff
 const scene = new THREE.Scene();
+var cammatr = new THREE.Matrix4();
 
 
 
@@ -271,7 +272,6 @@ class Scene{
 			xmldata = lxfmlfile.read()
 		}
 		else if (file.endsWith('.lxf')){
-			alert('IMAGE100.LXFML')
 			
 			var promise = new JSZip.external.Promise(function (resolve, reject) {
 				JSZipUtils.getBinaryContent(file, function(err, data) {
@@ -283,12 +283,12 @@ class Scene{
 				});
 			});
 
-			promise.then(JSZip.loadAsync)                     // 2) chain with the zip promise
+			promise.then(JSZip.loadAsync) // 2) chain with the zip promise
 			.then(function(zip) {
 				return zip.file("IMAGE100.LXFML").async("string"); // 3) chain with the text content promise
 			})
-			.then(function success(text) {                    // 4) display the result
-				
+			.then(function success(text) { // 4) display the result
+				//alert('IMAGE100.LXFML')
 				xmldata = text
 				console.log(xmldata)
 				
@@ -300,6 +300,10 @@ class Scene{
 		}
 		else {
 			return
+		}
+		
+		if (xmldata === ""){ 
+		alert(xmldata)
 		}
 		
 		var parser = new DOMParser();
@@ -584,6 +588,17 @@ class Converter {
 		var total = this.scene.Bricks.length
 		var current = 0
 		
+		for (const cam of this.scene.Scenecamera){
+			var camm = new THREE.Matrix4();
+			
+			camm.set(  cam.matrix.n11, cam.matrix.n21, cam.matrix.n31, cam.matrix.n41, 
+						cam.matrix.n12, cam.matrix.n22, cam.matrix.n32, cam.matrix.n42, 
+						cam.matrix.n13, cam.matrix.n23, cam.matrix.n33, cam.matrix.n43, 
+						cam.matrix.n14, cam.matrix.n24, cam.matrix.n34, cam.matrix.n44);
+			
+			cammatr.getInverse(camm)
+		}
+		
 		for (const bri of this.scene.Bricks){
 			current += 1
 		
@@ -597,7 +612,6 @@ class Converter {
 					
 					geo = geometriecache[pa.designID]
 				}
-				
 				
 				var ind = 0
 				var n11 = pa.Bones[ind].matrix.n11
@@ -1098,7 +1112,7 @@ else {
 var container = document.createElement( 'div' );
 document.body.appendChild( container );
 
-camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+camera = new THREE.PerspectiveCamera( 2.5, window.innerWidth / window.innerHeight, 1, 10000 );
 camera.position.set( 150, 200, 250 );
 
 // scene
@@ -1120,16 +1134,13 @@ container.appendChild( renderer.domElement );
 
 
 
-camera.position.set( 0, 4, 20 );
+camera.matrix = cammatr
 
 var controls = new THREE.OrbitControls (camera, renderer.domElement);
 
 var render = function () {
 	requestAnimationFrame(render);
-
 	//camera.rotation.z += 0.01;
-
-
 	renderer.render(scene, camera);
 };
 
