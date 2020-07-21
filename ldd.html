@@ -702,6 +702,15 @@ class Converter {
 					var materialCurrentPart = pa.materials[partindex]
 					var lddmat = allMaterials.getMaterialbyId(materialCurrentPart)
 					
+					if (typeof lddmat !== 'undefined'){
+						//nothing
+					}
+					else {
+						//lddmat undefined
+						console.log(materialCurrentPart)
+						var lddmat = allMaterials.getMaterialbyId(21)
+					}
+					
 					var deco = '0'
 					if (pa.hasOwnProperty('decoration') && geo.Parts[partindex].textures.length > 0 ){
 						if (decoCount < pa.decoration.length){
