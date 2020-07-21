@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<LXFML versionMajor="5" versionMinor="0" name="chicken">
+  <Meta>
+    <Application name="LEGO Digital Designer" versionMajor="4" versionMinor="3"/>
+    <Brand name="LDDExtended"/>
+    <BrickSet version="2670"/>
+  </Meta>
+  <Cameras>
+    <Camera refID="0" fieldOfView="80" distance="69.28204345703125" transformation="0.739173948764801025390625,0,-0.67351436614990234375,-0.2828894555568695068359375,0.9075148105621337890625,-0.3104678094387054443359375,0.6112244129180908203125,0.420019924640655517578125,0.670811355113983154296875,42.34686279296875,29.0998401641845703125,46.475170135498046875"/>
+  </Cameras>
+  <Bricks cameraRef="0">
+    <Brick refID="0" designID="95342">
+      <Part refID="0" designID="95342" materials="1">
+        <Bone refID="0" transformation="-0.3860814571380615234375,0,-0.92246472835540771484375,0,1,0,0.92246472835540771484375,0,-0.3860814571380615234375,0.399999916553497314453125,0.319996178150177001953125,-1.19999980926513671875">
+        </Bone>
+      </Part>
+    </Brick>
+    <Brick refID="1" designID="95342">
+      <Part refID="1" designID="95342" materials="1">
+        <Bone refID="1" transformation="0.47281610965728759765625,0,-0.881161272525787353515625,0,1,0,0.881161272525787353515625,0,0.47281610965728759765625,-1.2000000476837158203125,0.319999992847442626953125,4.400000095367431640625">
+        </Bone>
+      </Part>
+    </Brick>
+    <Brick refID="2" designID="95342">
+      <Part refID="2" designID="95342" materials="5">
+        <Bone refID="2" transformation="0,0,-1,0,1,0,1,0,0,-3.6000001430511474609375,0.319996178150177001953125,0.400000095367431640625">
+        </Bone>
+      </Part>
+    </Brick>
+  </Bricks>
+  <RigidSystems>
+    <RigidSystem>
+      <Rigid refID="0" transformation="1,0,0,0,1,0,0,0,1,0.3999998569488525390625,0,-1.19999992847442626953125" boneRefs="0"/>
+    </RigidSystem>
+    <RigidSystem>
+      <Rigid refID="1" transformation="1,0,0,0,1,0,0,0,1,-1.2000000476837158203125,0,4.400000095367431640625" boneRefs="1"/>
+    </RigidSystem>
+    <RigidSystem>
+      <Rigid refID="2" transformation="1,0,0,0,1,0,0,0,1,-3.6000001430511474609375,0,0.400000095367431640625" boneRefs="2"/>
+    </RigidSystem>
+  </RigidSystems>
+  <GroupSystems>
+    <GroupSystem>
+    </GroupSystem>
+  </GroupSystems>
+  <BuildingInstructions>
+  </BuildingInstructions>
+</LXFML>
