@@ -946,10 +946,10 @@ class Material {
 
 
 function FindDBURL(){
-	var dburl = 'https://api.github.com/repos/sttng/LDD-DB/git/trees/master?recursive=1'
+	var dburl = 'https://api.github.com/repos/stldd/LDD-DB/git/trees/master?recursive=1'
 	let xhr = new XMLHttpRequest();
 	xhr.open('GET', dburl, false);  // `false` makes the request synchronous
-	xhr.setRequestHeader("Authorization", "token 0c8d5b77e090e3ddaefc24a708aec7eb90a1293c");
+	xhr.setRequestHeader("Authorization", "token 818a4c34c50bc8990f8b7eec66438ba6108a2f16"); //818a4c34c50bc8990f8b7eec66438ba6108a2f16 //0c8d5b77e090e3ddaefc24a708aec7eb90a1293c
 
 	// request state change event
 	xhr.onreadystatechange = function() {
@@ -1041,7 +1041,7 @@ class DBURLReader {
 		var self = this;
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', dburl, false);
-		xhr.setRequestHeader("Authorization", "token 0c8d5b77e090e3ddaefc24a708aec7eb90a1293c");
+		xhr.setRequestHeader("Authorization", "token 818a4c34c50bc8990f8b7eec66438ba6108a2f16"); //818a4c34c50bc8990f8b7eec66438ba6108a2f16
 		
 		// request state change event
 		xhr.onreadystatechange = function() {
@@ -1059,7 +1059,7 @@ class DBURLReader {
 						// nothing todo
 					}
 					else if (obj.type == 'blob'){
-						self.filelist[obj.path] = new DBURLFile('https://raw.githubusercontent.com/sttng/LDD-DB/master/' + obj.path, obj.path)
+						self.filelist[obj.path] = new DBURLFile('https://raw.githubusercontent.com/stldd/LDD-DB/master/' + obj.path, obj.path)
 					}
 					else {
 						console.log('Strange object parsed: ' + obj.type)
@@ -1145,8 +1145,6 @@ var render = function () {
 };
 
 render();
-
-
 
 
 </script>
