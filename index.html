@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Your Title Here</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+	<script type="module">
+import {pipe, fork, assign, tap, tryCatch, switchCase, map, filter, reduce, transform, any, all, and, or, not, eq, gt, lt, gte, lte, get, pick, omit,
+} from 'https://unpkg.com/rubico/es.js'
+
+
+
+// your code here
+
+
+
+//pipe([
+//  fetch,
+//  res => res.json(),
+//  console.log, // > {...}
+//])('https://api.github.com/repos/stldd/LDD-DB/git/trees/master?recursive=1', {headers: {Authorization: 'token 818a4c34c50bc8990f8b7eec66438ba6108a2f16'}})
+
+
+fetch('https://api.github.com/repos/stldd/LDD-DB/git/trees/master?recursive=1', {headers: {Authorization: 'token 818a4c34c50bc8990f8b7eec66438ba6108a2f16'}})
+	.then(response => response.json())
+	.then(data => data.tree)
+	.then(console.log);
+	
+
+fetch('https://github.com/sttng/LDD/raw/master/test01.lxfml', {mode: 'no-cors', method: 'GET', credentials: 'same-origin'})
+	.then(function(resp) {
+		return resp.text();
+	})
+	.then(function(data){
+		let parser = new DOMParser()
+		let xmlDoc = data //parser.parseFromString(data, 'text/xml');
+		console.log(xmlDoc);
+	});
+	
+function checkStatus(response) {
+	if (!response.ok) {
+		throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+	}
+	return response;
+}
+
+
+
+//new JSZip.external.Promise(function (resolve, reject) {
+//	JSZipUtils.getBinaryContent('https://github.com/sttng/LDD/raw/master/test01.lxf', function(err, data) {
+//		if (err) {
+//			reject(err);
+//		} else {
+//			resolve(data);
+//		}
+//	});
+//}).then(function (data) {
+//	return JSZip.loadAsync(data);
+//})
+//.then(...)
+
+
+
+	</script>
+</head>
+<body></body>
+</html>
