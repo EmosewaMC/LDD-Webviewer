@@ -259,22 +259,53 @@ class SceneCamera{
 }
 
 
+class InstructionStep{
+	constructor(camera, name, parts ){
+	this.camera = camera
+	this.name = name
+	this.allStepParts = parts
+	console.log(this)
+	}
+}
+
+
 class SceneBuildingInstruction{
-	//done
 	constructor(node){
 		this.name = node.getAttribute('name')
-
+		this.steps =[]
+		
+		var currentStepCamera
+		var currentStepName
 		var childnodes = node.childNodes
+		var allStepParts = []
 		for (var j = 0; j < childnodes.length ;j++) {
 			var childnode = childnodes[j]
 			
 			if (childnode.nodeName == 'Camera'){
-				console.log(childnode.getAttribute('cameraRef'))
+				currentStepCamera = childnode.getAttribute('cameraRef')
 			}
 			else if (childnode.nodeName == 'Step'){
-				console.log(childnode.getAttribute('name'))
+				currentStepName = childnode.getAttribute('name')
+				var subchildnodes = childnode.childNodes
+				for (var k = 0; k < subchildnodes.length ;k++) {
+					var subchildnode = subchildnodes[k]
+					if (subchildnode.nodeName == 'PartRef'){
+						allStepParts.push(subchildnode.getAttribute('partRef'))
+						this.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts))
+					}
+					else if (subchildnode.nodeName == 'Camera'){
+					
+					}
+					else if (subchildnode.nodeName == 'Step'){
+						//possibly recursive here
+					}
+				}
 			}
 		}
+	}
+	
+	parseStep(){
+	
 	}
 }
 
