@@ -260,11 +260,10 @@ class SceneCamera{
 
 
 class InstructionStep{
-	constructor(camera, name, parts ){
+	constructor(camera, name, parts){
 	this.camera = camera
 	this.name = name
-	this.allStepParts = parts
-	console.log(this)
+	this.allStepParts = parts.split(',');
 	}
 }
 
@@ -274,10 +273,23 @@ class SceneBuildingInstruction{
 		this.name = node.getAttribute('name')
 		this.steps =[]
 		
-		var currentStepCamera
-		var currentStepName
+
 		var childnodes = node.childNodes
-		var allStepParts = []
+		var parts = []
+		this.parseStep(node, parts)
+		console.log(this.steps)
+	}
+	
+	parseStep(node, StepParts){
+										
+						console.log(StepParts)
+
+		var self = this;
+		var allStepParts =[]
+		var currentStepCamera
+		var childnodes = node.childNodes
+		var currentStepName
+		
 		for (var j = 0; j < childnodes.length ;j++) {
 			var childnode = childnodes[j]
 			
@@ -291,21 +303,23 @@ class SceneBuildingInstruction{
 					var subchildnode = subchildnodes[k]
 					if (subchildnode.nodeName == 'PartRef'){
 						allStepParts.push(subchildnode.getAttribute('partRef'))
-						this.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts))
+						self.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts.join(',')))
 					}
 					else if (subchildnode.nodeName == 'Camera'){
 					
 					}
 					else if (subchildnode.nodeName == 'Step'){
-						//possibly recursive here
+						console.log(allStepParts)
+						self.parseStep(subchildnode, allStepParts)
+
+						self.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts.concat(StepParts).join(',')))
 					}
 				}
 			}
 		}
-	}
-	
-	parseStep(){
-	
+
+		//allStepParts.concat(StepParts)
+		
 	}
 }
 
