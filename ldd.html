@@ -259,12 +259,34 @@ class SceneCamera{
 }
 
 
+class SceneBuildingInstruction{
+	//done
+	constructor(node){
+		this.name = node.getAttribute('name')
+
+		var childnodes = node.childNodes
+		for (var j = 0; j < childnodes.length ;j++) {
+			var childnode = childnodes[j]
+			
+			if (childnode.nodeName == 'Camera'){
+				console.log(childnode.getAttribute('cameraRef'))
+			}
+			else if (childnode.nodeName == 'Step'){
+				console.log(childnode.getAttribute('name'))
+			}
+		}
+	}
+}
+
+
+
 class Scene{
 	//partially done - need zip file handling
 	constructor(file){
 		this.Bricks = []
 		this.Scenecamera = []
 		this.Groups = []
+		this.SceneBuildingInstructions = []
 		var xmldata =''
 		if (file.endsWith('.lxfml')){
 			var lxfmlfile = new DBURLFile(file,file)
@@ -351,6 +373,15 @@ class Scene{
 								this.Groups.push(new Group(subchildnode))
 							}
 						}
+					}
+				}
+			}
+			else if (node.nodeName == 'BuildingInstructions'){
+				var childnodes = node.childNodes
+				for (var j = 0; j < childnodes.length ;j++) {
+					var childnode = childnodes[j]
+					if (childnode.nodeName == 'BuildingInstruction'){
+						this.SceneBuildingInstructions.push(new SceneBuildingInstruction(childnode))
 					}
 				}
 			}
