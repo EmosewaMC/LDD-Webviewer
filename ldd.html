@@ -281,9 +281,6 @@ class SceneBuildingInstruction{
 	}
 	
 	parseStep(node, StepParts){
-										
-						console.log(StepParts)
-
 		var self = this;
 		var allStepParts =[]
 		var currentStepCamera
@@ -301,25 +298,22 @@ class SceneBuildingInstruction{
 				var subchildnodes = childnode.childNodes
 				for (var k = 0; k < subchildnodes.length ;k++) {
 					var subchildnode = subchildnodes[k]
-					if (subchildnode.nodeName == 'PartRef'){
-						allStepParts.push(subchildnode.getAttribute('partRef'))
-						self.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts.join(',')))
+					if (subchildnode.nodeName == 'Camera'){
+						currentStepCamera = subchildnode.getAttribute('cameraRef')
 					}
-					else if (subchildnode.nodeName == 'Camera'){
-					
+					else if (subchildnode.nodeName == 'PartRef'){
+						allStepParts.push(subchildnode.getAttribute('partRef'))
 					}
 					else if (subchildnode.nodeName == 'Step'){
-						console.log(allStepParts)
-						self.parseStep(subchildnode, allStepParts)
-
-						self.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts.concat(StepParts).join(',')))
+						var subStepParts = self.parseStep(subchildnode, allStepParts)
+						var allStepParts = allStepParts.concat(subStepParts).join(',')
+						allStepParts = allStepParts.split(',');
 					}
 				}
+				self.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts.join(',')))
 			}
 		}
-
-		//allStepParts.concat(StepParts)
-		
+		return allStepParts
 	}
 }
 
