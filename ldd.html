@@ -260,6 +260,7 @@ class SceneCamera{
 
 
 class InstructionStep{
+	//done
 	constructor(camera, name, parts){
 	this.camera = camera
 	this.name = name
@@ -269,6 +270,7 @@ class InstructionStep{
 
 
 class SceneBuildingInstruction{
+	//done
 	constructor(node){
 		this.name = node.getAttribute('name')
 		this.steps =[]
@@ -277,7 +279,10 @@ class SceneBuildingInstruction{
 		var childnodes = node.childNodes
 		var parts = []
 		this.parseStep(node, parts)
-		console.log(this.steps)
+		
+		//generateScenefromStep only for testing here
+		//console.log(this.steps.length)
+		//this.generateScenefromStep(this.steps[17])
 	}
 	
 	parseStep(node, StepParts){
@@ -318,7 +323,6 @@ class SceneBuildingInstruction{
 }
 
 
-
 class Scene{
 	//partially done - need zip file handling
 	constructor(file){
@@ -326,10 +330,10 @@ class Scene{
 		this.Scenecamera = []
 		this.Groups = []
 		this.SceneBuildingInstructions = []
-		var xmldata =''
+		this.xmldata = ''
 		if (file.endsWith('.lxfml')){
 			var lxfmlfile = new DBURLFile(file,file)
-			xmldata = lxfmlfile.read()
+			this.xmldata = lxfmlfile.read()
 		}
 		else if (file.endsWith('.lxf')){
 			
@@ -349,8 +353,8 @@ class Scene{
 			})
 			.then(function success(text) { // 4) display the result
 				//alert('IMAGE100.LXFML')
-				xmldata = text
-				console.log(xmldata)
+				this.xmldata = text
+				console.log(this.xmldata)
 				
 				
 				
@@ -362,12 +366,12 @@ class Scene{
 			return
 		}
 		
-		if (xmldata === ""){ 
-		alert(xmldata)
+		if (this.xmldata === ""){ 
+		alert(this.xmldata)
 		}
 		
 		var parser = new DOMParser();
-		var xml = parser.parseFromString(xmldata, "text/xml");
+		var xml = parser.parseFromString(this.xmldata, "text/xml");
 		this.Name = xml.firstChild.getAttribute('name')
 		
 		var nodes = xml.firstChild.childNodes;
@@ -1055,6 +1059,44 @@ function FindDBURL(){
 	return dburl
 }
 
+
+function generateScenefromStep(InstructionStep){
+	var sceneXML = String(converter.scene.xmldata)
+	parser = new DOMParser();
+	xmlDoc = parser.parseFromString(sceneXML,"text/xml");
+	
+	path = "/LXFML/Cameras/Camera[@refID=" + InstructionStep.camera + "]"
+	var nodes = xmlDoc.evaluate(path, xmlDoc, null, XPathResult.ANY_TYPE, null);
+	var cam = nodes.iterateNext();
+	cam = new XMLSerializer().serializeToString(cam)
+	console.log(cam)
+	
+	var nodes = xmlDoc.evaluate("/LXFML/GroupSystems", xmlDoc, null, XPathResult.ANY_TYPE, null);
+	var groups = nodes.iterateNext();
+	groups = new XMLSerializer().serializeToString(groups)
+	console.log(groups)
+	
+	var xpathstr =''
+	var andchar =''
+	for (var partID of InstructionStep.allStepParts){
+		
+		xpathstr = xpathstr + andchar + "/LXFML/Bricks/Brick/Part[@refID=\'" + partID + "\']"
+		andchar =' | '
+	}
+	
+	var nodes = xmlDoc.evaluate(xpathstr, xmlDoc, null, XPathResult.ANY_TYPE, null);
+	
+	var result = nodes.iterateNext();
+	while (result) {
+		var part = new XMLSerializer().serializeToString(result)
+		console.log(part)
+		result = nodes.iterateNext();
+	}
+	
+	
+}
+
+
 class DBURLFile {
 	constructor(urlHandle, name) {
 		this.urlHandle = urlHandle
@@ -1179,6 +1221,14 @@ if (ldddburl) {
 	converter = new Converter()
 	converter.LoadDBURL(dbURLlocation = ldddburl)
 	converter.LoadScene(filename = scenefile)
+	if (pageparams.get('step')){
+		///console.log(pageparams.get('step'))
+		var theStep = converter.scene.SceneBuildingInstructions[0].steps[pageparams.get('step')]
+		//console.log(theStep)
+		generateScenefromStep(theStep)
+		//converter.LoadScene(filename = scenefile)
+	}
+	
 	converter.Export(filename = 'test.webgl')
 	
 }
