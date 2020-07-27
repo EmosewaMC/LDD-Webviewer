@@ -18,6 +18,7 @@
 		<div id="info">
 		LDD (lxfml) Webviewer <a href="https://sttng.github.io/LDD-Webviewer/ldd.html?scene=https://raw.githubusercontent.com/sttng/LDD-Webviewer/master/Redbeard.lxfml" target="_blank" rel="noopener">Try another</a>
 		</div>
+		<div id="steps"></div>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
@@ -270,7 +271,7 @@ class InstructionStep{
 
 
 class SceneBuildingInstruction{
-	//still has bugs
+	//still has bugs ? Maybe ?
 	constructor(node){
 		this.name = node.getAttribute('name')
 		this.steps =[]
@@ -286,6 +287,8 @@ class SceneBuildingInstruction{
 		var currentStepCamera
 		var childnodes = node.childNodes
 		var currentStepName = node.getAttribute('name')
+		//console.log(new XMLSerializer().serializeToString(node))
+
 		
 		for (var j = 0; j < childnodes.length ;j++) {
 			var childnode = childnodes[j]
@@ -295,7 +298,6 @@ class SceneBuildingInstruction{
 			}
 			else if (childnode.nodeName == 'Step'){
 				currentStepName = childnode.getAttribute('name')
-				console.log(currentStepName)
 				var subchildnodes = childnode.childNodes
 				for (var k = 0; k < subchildnodes.length ;k++) {
 					var subchildnode = subchildnodes[k]
@@ -314,7 +316,7 @@ class SceneBuildingInstruction{
 				self.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts.join(',')))
 			}
 			else if (childnode.nodeName == 'PartRef'){
-				console.log('mumuj' + currentStepName)
+				allStepParts.push(childnode.getAttribute('partRef'))
 			}
 		}
 		return allStepParts
@@ -1228,9 +1230,24 @@ if (ldddburl) {
 	converter.LoadScene(filename = scenefile)
 	if (pageparams.get('step')){
 		var theStep = converter.scene.SceneBuildingInstructions[0].steps[pageparams.get('step')]
+		var maxSteps = converter.scene.SceneBuildingInstructions[0].steps.length
 		var currentStepScene = generateScenefromStep(theStep)
 		//console.log(currentStepScene)
 		converter.LoadScene(xmlStream = currentStepScene)
+		var currentLocation = window.location;
+		
+		if (parseInt(pageparams.get('step')) == 0) {
+			document.getElementById("info").innerHTML = `<a href="${currentLocation.pathname}?scene=${scenefile}&step=${parseInt(pageparams.get('step'))+1}"> Step ${parseInt(pageparams.get('step'))+1} ></a>`
+		}
+		
+		else if (parseInt(pageparams.get('step')) + 1 < maxSteps) {
+			document.getElementById("info").innerHTML = `<a href="${currentLocation.pathname}?scene=${scenefile}&step=${parseInt(pageparams.get('step'))-1}"> < Step ${parseInt(pageparams.get('step'))-1}</a>
+			
+<a href="${currentLocation.pathname}?scene=${scenefile}&step=${parseInt(pageparams.get('step'))+1}"> Step ${parseInt(pageparams.get('step'))+1} ></a>`;
+		}
+		else {
+			document.getElementById("info").innerHTML = `<a href="${currentLocation.pathname}?scene=${scenefile}&step=${parseInt(pageparams.get('step'))-1}"> < Step ${parseInt(pageparams.get('step'))-1}</a>`
+		}
 	}
 	
 	converter.Export(filename = 'test.webgl')
