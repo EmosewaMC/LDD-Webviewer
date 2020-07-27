@@ -270,12 +270,11 @@ class InstructionStep{
 
 
 class SceneBuildingInstruction{
-	//done
+	//still has bugs
 	constructor(node){
 		this.name = node.getAttribute('name')
 		this.steps =[]
 		
-
 		var childnodes = node.childNodes
 		var parts = []
 		this.parseStep(node, parts)
@@ -286,7 +285,7 @@ class SceneBuildingInstruction{
 		var allStepParts =[]
 		var currentStepCamera
 		var childnodes = node.childNodes
-		var currentStepName
+		var currentStepName = node.getAttribute('name')
 		
 		for (var j = 0; j < childnodes.length ;j++) {
 			var childnode = childnodes[j]
@@ -296,6 +295,7 @@ class SceneBuildingInstruction{
 			}
 			else if (childnode.nodeName == 'Step'){
 				currentStepName = childnode.getAttribute('name')
+				console.log(currentStepName)
 				var subchildnodes = childnode.childNodes
 				for (var k = 0; k < subchildnodes.length ;k++) {
 					var subchildnode = subchildnodes[k]
@@ -312,6 +312,9 @@ class SceneBuildingInstruction{
 					}
 				}
 				self.steps.push(new InstructionStep(currentStepCamera, currentStepName, allStepParts.join(',')))
+			}
+			else if (childnode.nodeName == 'PartRef'){
+				console.log('mumuj' + currentStepName)
 			}
 		}
 		return allStepParts
