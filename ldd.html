@@ -31,7 +31,6 @@ const scene = new THREE.Scene();
 var cammatr = new THREE.Matrix4();
 
 
-
 class Matrix3D{
 	//done
 	constructor(n11=1,n12=0,n13=0,n14=0,n21=0,n22=1,n23=0,n24=0,n31=0,n32=0,n33=1,n34=0,n41=0,n42=0,n43=0,n44=1){
@@ -110,6 +109,7 @@ class Matrix3D{
 			this.n14 * other.n41 + this.n24 * other.n42 + this.n34 * other.n43 + this.n44 * other.n44)
 	}
 }
+
 
 class Point3D{
 	//done
@@ -279,10 +279,6 @@ class SceneBuildingInstruction{
 		var childnodes = node.childNodes
 		var parts = []
 		this.parseStep(node, parts)
-		
-		//generateScenefromStep only for testing here
-		//console.log(this.steps.length)
-		//this.generateScenefromStep(this.steps[17])
 	}
 	
 	parseStep(node, StepParts){
@@ -361,6 +357,11 @@ class Scene{
 			}, function error(e) {
 				console.log(e)
 			});
+		}
+		else if (file.endsWith('</LXFML>')) {
+			//dirty way of stream detection
+			this.xmldata = file
+			console.log('Step stream')
 		}
 		else {
 			return
@@ -629,7 +630,7 @@ class DBinfo {
 class Converter {
 	
 	constructor(){
-		this.allMaterials =''
+		this.allMaterials = ''
 	}
 	
 	LoadDBURL(dbURLlocation){
@@ -656,7 +657,6 @@ class Converter {
 		var textOffset = 1
 		var usedmaterials = []
 		var geometriecache = {}
-		
 		
 		var total = this.scene.Bricks.length
 		var current = 0
@@ -866,14 +866,6 @@ class LOCReader {
 }
 
 
-
-
-
-
-
-
-
-
 class Bone2 {
 	//done
 	constructor(boneId=0, angle=0, ax=0, ay=0, az=0, tx=0, ty=0, tz=0){
@@ -970,10 +962,6 @@ class Primitive {
 }
 
 
-
-
-
-
 class Materials {
 	//done
 	constructor(data) {
@@ -1062,37 +1050,51 @@ function FindDBURL(){
 
 function generateScenefromStep(InstructionStep){
 	var sceneXML = String(converter.scene.xmldata)
+	var stepName = InstructionStep.name
+	var sceneName =  converter.scene.Name
+	
 	parser = new DOMParser();
 	xmlDoc = parser.parseFromString(sceneXML,"text/xml");
+	
+	var xmlheader = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<LXFML versionMajor="5" versionMinor="0" name="${sceneName}_${stepName}">
+	<Meta>
+		<Application name="LEGO Digital Designer" versionMajor="4" versionMinor="3"/>
+		<Brand name="LDDExtended"/>
+	<BrickSet version="2670"/>
+</Meta>
+`
 	
 	path = "/LXFML/Cameras/Camera[@refID=" + InstructionStep.camera + "]"
 	var nodes = xmlDoc.evaluate(path, xmlDoc, null, XPathResult.ANY_TYPE, null);
 	var cam = nodes.iterateNext();
-	cam = new XMLSerializer().serializeToString(cam)
-	console.log(cam)
+	cam = '<Cameras>\n\t' + new XMLSerializer().serializeToString(cam) + '\n</Cameras>\n'
 	
 	var nodes = xmlDoc.evaluate("/LXFML/GroupSystems", xmlDoc, null, XPathResult.ANY_TYPE, null);
 	var groups = nodes.iterateNext();
 	groups = new XMLSerializer().serializeToString(groups)
-	console.log(groups)
 	
-	var xpathstr =''
-	var andchar =''
+	var xpathstr = ''
+	var andchar = ''
 	for (var partID of InstructionStep.allStepParts){
-		
 		xpathstr = xpathstr + andchar + "/LXFML/Bricks/Brick/Part[@refID=\'" + partID + "\']"
 		andchar =' | '
 	}
 	
 	var nodes = xmlDoc.evaluate(xpathstr, xmlDoc, null, XPathResult.ANY_TYPE, null);
-	
 	var result = nodes.iterateNext();
+	var allParts = ''
 	while (result) {
 		var part = new XMLSerializer().serializeToString(result)
-		console.log(part)
+		part =  '\n\t<Brick refID="" designID="">' + part + '\n</Brick>'
+		allParts = allParts + part
+		//console.log(part)
 		result = nodes.iterateNext();
 	}
+	allParts = `<Bricks cameraRef="${InstructionStep.camera}">` + allParts + '\n</Bricks>\n'
 	
+	var stepScene = xmlheader + cam + allParts + groups + '\n</LXFML>'
+	return stepScene
 	
 }
 
@@ -1222,11 +1224,10 @@ if (ldddburl) {
 	converter.LoadDBURL(dbURLlocation = ldddburl)
 	converter.LoadScene(filename = scenefile)
 	if (pageparams.get('step')){
-		///console.log(pageparams.get('step'))
 		var theStep = converter.scene.SceneBuildingInstructions[0].steps[pageparams.get('step')]
-		//console.log(theStep)
-		generateScenefromStep(theStep)
-		//converter.LoadScene(filename = scenefile)
+		var currentStepScene = generateScenefromStep(theStep)
+		//console.log(currentStepScene)
+		converter.LoadScene(xmlStream = currentStepScene)
 	}
 	
 	converter.Export(filename = 'test.webgl')
