@@ -210,7 +210,8 @@ class Part{
 		var lastm = '0'
 		for (const [i, m] of this.materials.entries()) {
 			if (m == '0'){
-				this.materials[i] = lastm
+				//this.materials[i] = lastm
+				this.materials[i] = this.materials[0]
 			}
 			else {
 				lastm = m
