@@ -682,15 +682,14 @@ class Converter {
 			current += 1
 		
 			for (const pa of bri.Parts){
-				
-				if (!(pa.designID in geometriecache)) {
-					var geo = new Geometry(pa.designID, this.database)
-					geometriecache[pa.designID] = geo
-				}
-				else {
-					
-					geo = geometriecache[pa.designID]
-				}
+				var geo = new Geometry(pa.designID, this.database)
+				//if (!(pa.designID in geometriecache)) {
+				//	var geo = new Geometry(pa.designID, this.database)
+				//	geometriecache[pa.designID] = geo
+				//}
+				//else {	
+				//	geo = geometriecache[pa.designID]
+				//}
 				
 				var ind = 0
 				var n11 = pa.Bones[ind].matrix.n11
@@ -1220,7 +1219,7 @@ var pageparams = window.location.search
 	}
 	
 	else{
-		scenefile = "https://raw.githubusercontent.com/sttng/LDD/master/min.lxfml"
+		scenefile = "https://raw.githubusercontent.com/sttng/LDD-Webviewer/master/min.lxfml"
 	}
 
 var ldddburl = FindDBURL()
