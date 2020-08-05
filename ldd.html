@@ -829,7 +829,9 @@ class Converter {
 					var mesh = new THREE.Mesh(geometry, materials);
 					mesh.matrixAutoUpdate = false
 					mesh.matrix = m
+					var normalHelper = new VertexNormalsHelper(mesh, 2, 0x00ff00, 1 );
 					scene.add(mesh);
+					scene.add(normalHelper);
 				}
 				
 			
