@@ -1290,6 +1290,7 @@ container.appendChild( renderer.domElement );
 camera.matrix = cammatr
 
 var controls = new THREE.OrbitControls (camera, renderer.domElement);
+if ( vnh ) vnh.update();
 
 var render = function () {
 	requestAnimationFrame(render);
